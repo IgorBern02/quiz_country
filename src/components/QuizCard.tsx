@@ -14,7 +14,6 @@ export const QuizCard = ({
   question,
   onAnswer,
   feedback,
-  score,
   isChanging,
   timeLeft,
 }: QuizCardProps) => {

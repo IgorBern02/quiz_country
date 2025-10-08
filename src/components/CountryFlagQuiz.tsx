@@ -119,7 +119,7 @@ export const CountryFlagQuiz = () => {
       if (!gameStats.isGameOver && (isCorrect || gameStats.lives > 1)) {
         generateQuestion();
       }
-    }, 1500);
+    }, 1000);
   };
 
   const restartGame = () => {
