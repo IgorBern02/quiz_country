@@ -110,7 +110,7 @@ export const CountryFlagQuiz = () => {
       setGameStats((prev) => ({ ...prev, score: prev.score + 1 }));
       setFeedback("✅ Correto! +1 ponto");
     } else {
-      setFeedback(`❌ Errado! Era ${question.answer.name.common}`);
+      setFeedback(`❌ Errado! Era  ${question.answer.name.common}`);
       loseLife();
     }
 
