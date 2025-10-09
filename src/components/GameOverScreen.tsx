@@ -39,17 +39,17 @@ export const GameOverScreen = ({ score, onRestart }: GameOverScreenProps) => {
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 flex flex-col items-center justify-center">
           <button
             onClick={onRestart}
-            className="w-full bg-green-500 hover:bg-green-600 text-white py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg"
+            className="w-full bg-green-500 hover:bg-green-600 text-white py-4 px-6 cursor-pointer rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg"
           >
             🔄 Jogar Novamente
           </button>
 
           <Link
             to="/"
-            className="w-full bg-red-500 hover:bg-red-600 text-white py-4 px-6 rounded-xl font-bold"
+            className="w-full bg-red-500 hover:bg-red-600 text-white py-4 px-6 cursor-pointer rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg"
           >
             Voltar para o início
           </Link>

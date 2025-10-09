@@ -19,6 +19,7 @@ export const CountryFlagQuiz = () => {
   const [feedback, setFeedback] = useState<string>("");
   const [isChanging, setIsChanging] = useState<boolean>(false);
   const [gameStats, setGameStats] = useState<GameStats>(INITIAL_STATS);
+  const [skipsLeft, setSkipsLeft] = useState(2);
 
   const timerRef = useRef<number | null>(null);
 
@@ -233,21 +234,26 @@ export const CountryFlagQuiz = () => {
       />
 
       <button
-        onClick={() => generateQuestion()}
-        disabled={isChanging || gameStats.isGameOver}
+        onClick={() => {
+          generateQuestion();
+          setSkipsLeft((prev) => prev - 1);
+        }}
+        disabled={isChanging || gameStats.isGameOver || skipsLeft <= 0}
         className={`
-          mt-6 bg-green-500 hover:bg-green-600 text-white py-3 px-6 
-          rounded-lg font-semibold transition-all duration-300
-          transform hover:scale-105 active:scale-95
-          focus:outline-none focus:ring-2 focus:ring-green-300
-          ${
-            isChanging || gameStats.isGameOver
-              ? "opacity-50 cursor-not-allowed"
-              : "opacity-100"
-          }
-        `}
+    mt-6 bg-green-500 hover:bg-green-600 text-white py-3 px-6 
+    rounded-lg font-semibold transition-all duration-300
+    transform hover:scale-105 active:scale-95
+    focus:outline-none focus:ring-2 focus:ring-green-300
+    ${
+      isChanging || gameStats.isGameOver || skipsLeft <= 0
+        ? "opacity-50 cursor-not-allowed"
+        : "opacity-100"
+    }
+  `}
       >
-        {isChanging ? "⏳ Carregando..." : "🔄 Pular Bandeira"}
+        {isChanging
+          ? "⏳ Carregando..."
+          : `🔄 Pular Bandeira (${skipsLeft} restantes)`}
       </button>
     </div>
   );
