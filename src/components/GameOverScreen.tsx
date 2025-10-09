@@ -1,9 +1,22 @@
+import { useEffect } from "react";
+import { Link } from "react-router";
+
 interface GameOverScreenProps {
   score: number;
   onRestart: () => void;
 }
 
 export const GameOverScreen = ({ score, onRestart }: GameOverScreenProps) => {
+  useEffect(() => {
+    // salvar pontuação no localStorage
+    const currentPlayer = localStorage.getItem("currentPlayer") || "Anônimo";
+    if (!currentPlayer) return;
+
+    const savedScores = JSON.parse(localStorage.getItem("scores") || "[]");
+    const newScores = [...savedScores, { name: currentPlayer, score: score }];
+    localStorage.setItem("scores", JSON.stringify(newScores));
+  }, [score]);
+
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-6">
       <div className="bg-white shadow-2xl rounded-2xl p-8 text-center max-w-md w-full animate-fade-in">
@@ -33,6 +46,13 @@ export const GameOverScreen = ({ score, onRestart }: GameOverScreenProps) => {
           >
             🔄 Jogar Novamente
           </button>
+
+          <Link
+            to="/"
+            className="w-full bg-red-500 hover:bg-red-600 text-white py-4 px-6 rounded-xl font-bold"
+          >
+            Voltar para o início
+          </Link>
 
           <div className="text-sm text-gray-600 bg-gray-100 p-3 rounded-lg">
             <p>💡 Dica: Tente ser mais rápido nas próximas!</p>
