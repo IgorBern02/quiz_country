@@ -15,23 +15,10 @@ export const useCountries = () => {
 
         console.log("Buscando países da API...");
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-          controller.abort();
-          throw new Error("Timeout - API não respondeu a tempo");
-        }, 8000);
-
         const res = await fetch(
-          "https://restcountries.com/v3.1/all?fields=name,flags,cca3",
-          {
-            signal: controller.signal,
-            headers: {
-              Accept: "application/json",
-            },
-          }
+          "https://restcountries.com/v3.1/all?fields=name,flags,cca3,region,independent",
+          { headers: { Accept: "application/json" } }
         );
-
-        clearTimeout(timeoutId);
 
         if (!res.ok) {
           throw new Error(`Erro HTTP ${res.status} - ${res.statusText}`);
@@ -39,13 +26,97 @@ export const useCountries = () => {
 
         const data = await res.json();
 
-        if (!Array.isArray(data)) {
-          throw new Error("Resposta da API não é um array válido");
-        }
+        // Lista de nomes a excluir (territórios, ilhas, microestados, etc)
+        const excludedNames = [
+          "Bermuda",
+          "Greenland",
+          "Guam",
+          "Cayman Islands",
+          "Isle of Man",
+          "Puerto Rico",
+          "Falkland Islands",
+          "Hong Kong",
+          "Macau",
+          "Jersey",
+          "Guernsey",
+          "Cook Islands",
+          "Aruba",
+          "Curacao",
+          "Montserrat",
+          "Saint Martin",
+          "Sint Maarten",
+          "Faroe Islands",
+          "American Samoa",
+          "Gibraltar",
+          "Turks and Caicos Islands",
+          "Virgin Islands (U.S.)",
+          "Virgin Islands (British)",
+          "French Polynesia",
+          "New Caledonia",
+          "Reunion",
+          "Martinique",
+          "Guadeloupe",
+          "Mayotte",
+          "Curaçao",
+          "Åland Islands",
+          "Saint Pierre and Miquelon",
+          "Tokelau",
+          "Wallis and Futuna",
+          "Saint Barthélemy",
+          "Saint Helena, Ascension and Tristan da Cunha",
+          "Pitcairn Islands",
+          "Niue",
+          "Vatican City",
+          "San Marino",
+          "Liechtenstein",
+          "Monaco",
+          "Andorra",
+          "Belize",
+          "Bhutan",
+          "Brunei",
+          "Comoros",
+          "Djibouti",
+          "Eswatini",
+          "Ethiopia",
+          "Fiji",
+          "Gabon",
+          "Guyana",
+          "Samoa",
+          "Suriname",
+          "Tonga",
+          "Tuvalu",
+          "Eritrea",
+          "Vanuatu",
+          "Malta",
+          "Barbados",
+          "Chad",
+        ];
 
-        const filtered = data.filter(
-          (c: any) => c.name?.common && c.flags?.png && c.cca3
-        );
+        // Filtro principal
+        const filtered = data
+          .filter((c: any) => {
+            const name = c.name?.common;
+            return (
+              name &&
+              !excludedNames.includes(name) &&
+              c.flags?.png &&
+              c.cca3 &&
+              c.independent !== false &&
+              ["Europe", "Asia", "Africa", "Americas", "Oceania"].includes(
+                c.region
+              )
+            );
+          })
+          .map((c: any) => ({
+            ...c,
+            name: {
+              common: c.name.common,
+              commomn:
+                c.translations?.por?.common ||
+                c.translations?.pt?.common ||
+                c.name.common,
+            },
+          }));
 
         if (filtered.length < 4) {
           throw new Error(
@@ -53,16 +124,11 @@ export const useCountries = () => {
           );
         }
 
-        console.log(`✅ ${filtered.length} países carregados com sucesso`);
+        console.log(`✅ ${filtered.length} países carregados após filtragem`);
         setCountries(filtered);
       } catch (err: any) {
         console.error("Erro detalhado:", err);
-        const errorMessage =
-          err.name === "AbortError"
-            ? "A requisição demorou muito tempo. Verifique sua conexão."
-            : err.message || "Erro desconhecido ao carregar países";
-
-        setError(errorMessage);
+        setError(err.message || "Erro ao carregar países");
         setCountries([]);
       } finally {
         setLoading(false);

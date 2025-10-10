@@ -58,13 +58,13 @@ export const InitialScreen = () => {
               <div className="flex justify-center gap-4">
                 <button
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+                  className="px-4 py-2 rounded-lg border border-gray-300 cursor-pointer text-gray-600 hover:bg-gray-100 transition"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={confirmStart}
-                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition"
+                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 cursor-pointer text-white font-semibold shadow-md transition"
                 >
                   Começar
                 </button>

@@ -1,7 +1,20 @@
 export type Country = {
-  name: { common: string };
-  flags: { png: string };
+  name: {
+    common: string;
+  };
+  flags: {
+    png: string;
+    svg?: string;
+    alt?: string;
+  };
   cca3: string;
+  region?: string;
+  independent?: boolean;
+  population?: number;
+  translations?: {
+    por?: { official: string; common: string };
+    pt?: { official: string; common: string };
+  };
 };
 
 export interface Question {
