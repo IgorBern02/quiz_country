@@ -8,11 +8,27 @@ export const InitialScreen = () => {
   const [scores, setScores] = useState<{ name: string; score: number }[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [warning, setWarning] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // carregar pontuações do localStorage
+  // useEffect(() => {
+  //   const savedScores = JSON.parse(localStorage.getItem("scores") || "[]");
+  //   setScores(savedScores);
+  // }, []);
+
   useEffect(() => {
-    const savedScores = JSON.parse(localStorage.getItem("scores") || "[]");
-    setScores(savedScores);
+    const fetchRanking = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/scores");
+        const data = await res.json();
+        setScores(data);
+      } catch (err) {
+        console.error("Erro ao carregar ranking:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRanking();
   }, []);
 
   const handleStart = () => {
@@ -111,45 +127,51 @@ export const InitialScreen = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
             🏆 Tabela de Pontuação
           </h2>
-          <ul className="bg-white rounded-xl shadow-md divide-y divide-gray-100 overflow-hidden">
-            {scores.length === 0 ? (
-              <li className="p-3 text-gray-500">Nenhuma pontuação ainda 😅</li>
-            ) : (
-              scores
-                .sort((a, b) => b.score - a.score)
-                .slice(0, 3) // pega apenas o top 3
-                .map((player, index) => {
-                  let color = "";
-                  let medal = "";
+          {loading ? (
+            <p className="text-gray-500">Carregando...</p>
+          ) : (
+            <ul className="bg-white rounded-xl shadow-md divide-y divide-gray-100 overflow-hidden">
+              {scores.length === 0 ? (
+                <li className="p-3 text-gray-500">
+                  Nenhuma pontuação ainda 😅
+                </li>
+              ) : (
+                scores
+                  .sort((a, b) => b.score - a.score)
+                  .slice(0, 3) // pega apenas o top 3
+                  .map((player, index) => {
+                    let color = "";
+                    let medal = "";
 
-                  if (index === 0) {
-                    color = "text-yellow-500";
-                    medal = "🥇";
-                  } else if (index === 1) {
-                    color = "text-gray-400";
-                    medal = "🥈";
-                  } else if (index === 2) {
-                    color = "text-orange-600";
-                    medal = "🥉";
-                  }
+                    if (index === 0) {
+                      color = "text-yellow-500";
+                      medal = "🥇";
+                    } else if (index === 1) {
+                      color = "text-gray-400";
+                      medal = "🥈";
+                    } else if (index === 2) {
+                      color = "text-orange-600";
+                      medal = "🥉";
+                    }
 
-                  return (
-                    <li
-                      key={index}
-                      className={`flex justify-between items-center p-3 hover:bg-gray-50 transition ${color}`}
-                    >
-                      <span className="font-semibold whitespace-nowrap">
-                        {medal} {index + 1}º Lugar
-                      </span>
-                      <span className="font-medium truncate max-w-[150px]">
-                        {player.name}
-                      </span>
-                      <span className="font-bold">{player.score}</span>
-                    </li>
-                  );
-                })
-            )}
-          </ul>
+                    return (
+                      <li
+                        key={index}
+                        className={`flex justify-between items-center p-3 hover:bg-gray-50 transition ${color}`}
+                      >
+                        <span className="font-semibold whitespace-nowrap">
+                          {medal} {index + 1}º Lugar
+                        </span>
+                        <span className="font-medium truncate max-w-[150px]">
+                          {player.name}
+                        </span>
+                        <span className="font-bold">{player.score}</span>
+                      </li>
+                    );
+                  })
+              )}
+            </ul>
+          )}
         </motion.div>
 
         {/* Mensagem de aviso */}

@@ -96,12 +96,15 @@ export const useCountries = () => {
         const filtered = data
           .filter((c: any) => {
             const name = c.name?.common;
+            const isIndependent =
+              c.independent === undefined || c.independent === true;
+
             return (
               name &&
               !excludedNames.includes(name) &&
               c.flags?.png &&
               c.cca3 &&
-              c.independent !== false &&
+              isIndependent &&
               ["Europe", "Asia", "Africa", "Americas", "Oceania"].includes(
                 c.region
               )
@@ -111,7 +114,7 @@ export const useCountries = () => {
             ...c,
             name: {
               common: c.name.common,
-              commomn:
+              common_pt:
                 c.translations?.por?.common ||
                 c.translations?.pt?.common ||
                 c.name.common,

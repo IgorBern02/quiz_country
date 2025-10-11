@@ -8,6 +8,7 @@ interface QuizCardProps {
   score: number;
   isChanging: boolean;
   timeLeft: number;
+  disabled?: boolean;
 }
 
 export const QuizCard = ({
@@ -16,6 +17,7 @@ export const QuizCard = ({
   feedback,
   isChanging,
   timeLeft,
+  disabled,
 }: QuizCardProps) => {
   return (
     <div className="bg-white shadow-lg rounded-2xl p-6 text-center max-w-md w-full">
@@ -70,7 +72,7 @@ export const QuizCard = ({
             <OptionButton
               country={country}
               onClick={onAnswer}
-              disabled={isChanging}
+              disabled={isChanging || disabled}
             />
           </div>
         ))}

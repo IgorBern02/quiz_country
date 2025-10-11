@@ -8,13 +8,19 @@ interface GameOverScreenProps {
 
 export const GameOverScreen = ({ score, onRestart }: GameOverScreenProps) => {
   useEffect(() => {
-    // salvar pontuação no localStorage
-    const currentPlayer = localStorage.getItem("currentPlayer") || "Anônimo";
-    if (!currentPlayer) return;
-
-    const savedScores = JSON.parse(localStorage.getItem("scores") || "[]");
-    const newScores = [...savedScores, { name: currentPlayer, score: score }];
-    localStorage.setItem("scores", JSON.stringify(newScores));
+    const sendScore = async () => {
+      try {
+        const name = localStorage.getItem("playerName") || "Jogador";
+        await fetch("http://localhost:5000/api/scores", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, score }),
+        });
+      } catch (err) {
+        console.error("Erro ao salvar pontuação:", err);
+      }
+    };
+    sendScore();
   }, [score]);
 
   return (
