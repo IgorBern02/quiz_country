@@ -7,11 +7,13 @@ interface GameOverScreenProps {
 }
 
 export const GameOverScreen = ({ score, onRestart }: GameOverScreenProps) => {
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     const sendScore = async () => {
       try {
-        const name = localStorage.getItem("playerName") || "Jogador";
-        await fetch("http://localhost:5000/api/scores", {
+        const name = localStorage.getItem("currentPlayer") || "Jogador";
+        await fetch(`${API_URL}/api/scores`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, score }),

@@ -10,16 +10,12 @@ export const InitialScreen = () => {
   const [warning, setWarning] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // carregar pontuações do localStorage
-  // useEffect(() => {
-  //   const savedScores = JSON.parse(localStorage.getItem("scores") || "[]");
-  //   setScores(savedScores);
-  // }, []);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchRanking = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/scores");
+        const res = await fetch(`${API_URL}/api/scores`);
         const data = await res.json();
         setScores(data);
       } catch (err) {
