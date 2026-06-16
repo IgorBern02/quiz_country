@@ -9,7 +9,7 @@ import { GameOverScreen } from "./GameOverScreen";
 const INITIAL_STATS: GameStats = {
   score: 0,
   lives: 3,
-  timeLeft: 15,
+  timeLeft: 10,
   isGameOver: false,
 };
 
@@ -68,7 +68,7 @@ export const CountryFlagQuiz = () => {
       if (!data || data.length < 4 || gameStats.isGameOver) return;
 
       setIsChanging(true);
-      setGameStats((prev) => ({ ...prev, timeLeft: 15 }));
+      setGameStats((prev) => ({ ...prev, timeLeft: 10, isGameOver: false }));
 
       setTimeout(() => {
         const shuffled = [...data].sort(() => Math.random() - 0.5);
@@ -80,7 +80,7 @@ export const CountryFlagQuiz = () => {
         setIsChanging(false);
       }, 300);
     },
-    [countries, gameStats.isGameOver]
+    [countries, gameStats.isGameOver],
   );
 
   // Gera a primeira pergunta assim que os países carregam
@@ -183,8 +183,8 @@ export const CountryFlagQuiz = () => {
                 gameStats.timeLeft > 7
                   ? "bg-green-500"
                   : gameStats.timeLeft > 3
-                  ? "bg-yellow-500"
-                  : "bg-red-500 animate-pulse"
+                    ? "bg-yellow-500"
+                    : "bg-red-500 animate-pulse"
               }`}
               style={{ width: `${(gameStats.timeLeft / 15) * 100}%` }}
             />

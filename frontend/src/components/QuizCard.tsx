@@ -24,7 +24,7 @@ export const QuizCard = ({
       {/* Container da bandeira com animação */}
       <div className="relative w-64 h-40 mx-auto mb-6">
         <img
-          src={question.answer.flags.png}
+          src={question.answer.flag.url_svg || question.answer.flag.url_png}
           alt="bandeira"
           className={`
             w-full h-full object-cover rounded-md shadow

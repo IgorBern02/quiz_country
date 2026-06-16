@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { Country } from "../types/types";
+import type { Country, ApiCountry } from "../types/types";
 
 export const useCountries = () => {
   const [countries, setCountries] = useState<Country[]>([]);
@@ -15,9 +15,15 @@ export const useCountries = () => {
 
         console.log("Buscando países da API...");
 
+        console.log("API KEY:", import.meta.env.VITE_REST_COUNTRIES_API_KEY);
+
         const res = await fetch(
-          "https://restcountries.com/v3.1/all?fields=name,flags,cca3,region,independent",
-          { headers: { Accept: "application/json" } }
+          "https://api.restcountries.com/countries/v5?limit=100&response_fields=names.common,names.translations,region,population,classification,flag.url_png,flag.url_svg,flag.emoji,codes.alpha_3",
+          {
+            headers: {
+              Authorization: import.meta.env.VITE_REST_COUNTRIES_API_KEY,
+            },
+          },
         );
 
         if (!res.ok) {
@@ -26,112 +32,61 @@ export const useCountries = () => {
 
         const data = await res.json();
 
-        // Lista de nomes a excluir (territórios, ilhas, microestados, etc)
-        const excludedNames = [
-          "Bermuda",
-          "Greenland",
-          "Guam",
-          "Cayman Islands",
-          "Isle of Man",
-          "Puerto Rico",
-          "Falkland Islands",
-          "Hong Kong",
-          "Macau",
-          "Jersey",
-          "Guernsey",
-          "Cook Islands",
-          "Aruba",
-          "Curacao",
-          "Montserrat",
-          "Saint Martin",
-          "Sint Maarten",
-          "Faroe Islands",
-          "American Samoa",
-          "Gibraltar",
-          "Turks and Caicos Islands",
-          "Virgin Islands (U.S.)",
-          "Virgin Islands (British)",
-          "French Polynesia",
-          "New Caledonia",
-          "Reunion",
-          "Martinique",
-          "Guadeloupe",
-          "Mayotte",
-          "Curaçao",
-          "Åland Islands",
-          "Saint Pierre and Miquelon",
-          "Tokelau",
-          "Wallis and Futuna",
-          "Saint Barthélemy",
-          "Saint Helena, Ascension and Tristan da Cunha",
-          "Pitcairn Islands",
-          "Niue",
-          "Vatican City",
-          "San Marino",
-          "Liechtenstein",
-          "Monaco",
-          "Andorra",
-          "Belize",
-          "Bhutan",
-          "Brunei",
-          "Comoros",
-          "Djibouti",
-          "Eswatini",
-          "Ethiopia",
-          "Fiji",
-          "Gabon",
-          "Guyana",
-          "Samoa",
-          "Suriname",
-          "Tonga",
-          "Tuvalu",
-          "Eritrea",
-          "Vanuatu",
-          "Malta",
-          "Barbados",
-          "Chad",
-        ];
+        console.log(
+          data.data.objects
+            .filter((c: ApiCountry) => c.codes?.alpha_3)
+            .slice(0, 10),
+        );
 
         // Filtro principal
-        const filtered = data
-          .filter((c: any) => {
-            const name = c.name?.common;
-            const isIndependent =
-              c.independent === undefined || c.independent === true;
+        const filtered = data.data.objects
+          .filter((country: ApiCountry) => {
+            const name = country.names?.common;
+            const code = country.codes?.alpha_3;
 
             return (
               name &&
-              !excludedNames.includes(name) &&
-              c.flags?.png &&
-              c.cca3 &&
-              isIndependent &&
+              code &&
+              country.classification?.dependency === false &&
+              country.classification?.sovereign === true &&
+              country.population &&
+              country.population >= 1000000 &&
+              country.region &&
               ["Europe", "Asia", "Africa", "Americas", "Oceania"].includes(
-                c.region
+                country.region,
               )
             );
           })
-          .map((c: any) => ({
-            ...c,
-            name: {
-              common: c.name.common,
-              common_pt:
-                c.translations?.por?.common ||
-                c.translations?.pt?.common ||
-                c.name.common,
-            },
-          }));
+          .map(
+            (country: ApiCountry): Country => ({
+              name: {
+                common: country.names.common,
+                common_pt:
+                  country.names.translations?.por?.common ??
+                  country.names.common,
+              },
+              flag: {
+                url_png: country.flag?.url_png ?? "",
+                url_svg: country.flag?.url_svg ?? "",
+                emoji: country.flag?.emoji ?? "",
+              },
+              cca3: country.codes.alpha_3,
+              region: country.region,
+            }),
+          );
 
         if (filtered.length < 4) {
           throw new Error(
-            `Apenas ${filtered.length} países válidos encontrados (mínimo: 4)`
+            `Apenas ${filtered.length} países válidos encontrados (mínimo: 4)`,
           );
         }
 
         console.log(`✅ ${filtered.length} países carregados após filtragem`);
         setCountries(filtered);
-      } catch (err: any) {
+      } catch (err: unknown) {
+        console.log(import.meta.env.VITE_REST_COUNTRIES_API_KEY);
         console.error("Erro detalhado:", err);
-        setError(err.message || "Erro ao carregar países");
+        setError("Erro ao carregar países");
         setCountries([]);
       } finally {
         setLoading(false);
