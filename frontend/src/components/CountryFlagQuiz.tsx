@@ -186,7 +186,7 @@ export const CountryFlagQuiz = () => {
                     ? "bg-yellow-500"
                     : "bg-red-500 animate-pulse"
               }`}
-              style={{ width: `${(gameStats.timeLeft / 15) * 100}%` }}
+              style={{ width: `${(gameStats.timeLeft / 10) * 100}%` }}
             />
           </div>
           <div className="text-center mt-1 text-sm font-medium text-gray-600">
